@@ -1,0 +1,56 @@
+#This is the ip for the trex/gigatap
+trex: "172.16.0.101"
+#Username and password for trex
+trex_un: root
+trex_pw: putyourpasswordhere
+# usernames for least privilege files copying
+un1: admin1
+un2: administrator
+un3: root
+# ip's of boxes
+ip1: "10.52.51.201"
+ip2: "10.52.51.84"
+ip3: "10.52.51.204"
+ip4: "10.52.51.90"
+# password for everything don't use in production
+pass: "putyourpasswordhere"
+#Set directories where the scripts are
+rhel_sensor_directory: "~/playbooks_gigamon_testing/roles/Gigamon_test/files/rhel_sensors.sh"
+sensor_directory: "~/playbooks_gigamon_testing/roles/Gigamon_test/files/sensors.sh"
+trex_directory1: "~/playbooks_gigamon_testing/roles/Gigamon_test/files/{{ cap2name }}"
+trex_directory2: "~/playbooks_gigamon_testing/roles/Gigamon_test/files/http_cnn.pcap"
+
+vars_dir: "~/playbooks_gigamon_testing/roles/Gigamon_test/vars/main.yaml"
+rhel_initial_dir: "~/playbooks_gigamon_testing/roles/Gigamon_test/files/rhel_initial.sh"
+initial_dir: "~/playbooks_gigamon_testing/roles/Gigamon_test/files/initial.sh"
+drop_dir: "~/playbooks_gigamon_testing/roles/Gigamon_test/files/drop-rate.py"
+int_dir1: "~/playbooks_gigamon_testing/roles/Gigamon_test/files/check_int.py"
+int_dir2: "~/playbooks_gigamon_testing/roles/Gigamon_test/files/check_int_new.py"
+int_dir3: "~/playbooks_gigamon_testing/roles/Gigamon_test/files/check_int_dif.py"
+final_sensor_directory: "~/sensors.sh"
+final_rhel_sensor_directory: "~/rhel_sensors.sh"
+final_trex_directory1: "/opt/trex/v2.60/cap2/{{ cap2name }}"
+final_trex_directory2: "/opt/trex/v2.60/cap2/http_cnn.pcap"
+final_initial_dir: "~/initial.sh"
+final_rhel_initial_dir: "~/rhel_initial.sh"
+final_drop_dir: "~/drop-rate.py"
+final_int_dir1: "~/check_int.py"
+final_int_dir2: "~/check_int_new.py"
+final_int_dir3: "~/check_int_dif.py"
+suricata_dir1: "/var/log/nsm/admin1-super-server-eno8/suricata.log"
+suricata_dir2: "/var/log/nsm/administrator-rhev-hypervisor-ens4/suricata.log"
+suricata_dir3: "/var/log/nsm/ubuntu-ens7/suricata.log"
+#cap2 file name
+cap2name: "cnn_dns.yaml"
+#hosts to ssh
+#group1 is for security onion
+group1:
+  - "10.52.51.84"
+  - "10.52.51.201"
+  - "10.52.51.204"
+#group2 is for rhel not used right now
+group2:
+  - "10.52.51.90"
+#group3 is for trex
+group3:
+  - "172.16.0.101"

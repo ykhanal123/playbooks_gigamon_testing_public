@@ -1,0 +1,19 @@
+# inventory file which has variables for many groups based on context in the ansible playbook
+#this is for rhelgroup the interfaces and log file is specified
+[rhelgroup]
+rhelgroup_host1 ansible_host=10.52.51.90 suricata_dir=/var/log/suricata/suricata.log ansible_user=root int_1=eth1 int_2=ens6 
+# trex ip and user
+[group3root]
+group3root_host1 ansible_host=172.16.0.101 ansible_user=root
+# vars given when commands for all hosts such as passing variables are needed
+[allhosts]
+allhosts_host1 ansible_host=10.52.51.84 ansible_user=root
+allhosts_host2 ansible_host=10.52.51.201 ansible_user=root
+allhosts_host3 ansible_host=10.52.51.204 ansible_user=root
+allhosts_host3 ansible_host=10.52.51.90 ansible_user=root
+allhosts_host4 ansible_host=172.16.0.101 ansible_user=root
+# vars for the sensor hosts security onion
+[sensors]
+sensors_host1 ansible_host=10.52.51.84 suricata_dir=/var/log/nsm/admin1-super-server-eno8/suricata.log ansible_user=root int_1=eno7 int_2=eno8
+sensors_host2 ansible_host=10.52.51.201 suricata_dir=/var/log/nsm/admin1-rhev-hypervisor-ens6/suricata.log ansible_user=root int_1=ens4 int_2=ens6
+sensors_host3 ansible_host=10.52.51.204 suricata_dir=/var/log/nsm/ubuntu-ens7/suricata.log ansible_user=root int_1=ens3 int_2=ens7

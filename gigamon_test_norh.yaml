@@ -1,0 +1,133 @@
+# File name:
+# gigamon_test_norh.yaml
+#
+# Purpose:
+# Playbook that is used for testing Gigamon packet loss with bro and suricata on security onion
+#
+# Prerequisites:
+# pip install ansible
+# make sure bro and suricata are configured on the secuity onion machines. If using rhel make sure hey are installed and configured correctly.
+# update ~/playbooks_gigamon_testing/roles/Gigamon_test/vars/main.yaml with configuration values and ~/playbooks_gigamon_testing/inventory/inventory.yaml with inventory values
+#
+# Optional step for production environments (avoiding plain text passwords): encrypt the file using the command: ansible-vault encrypt vars.yaml
+# It will prompt for a password set one that is secure
+# Remember the password that is set as you'll need it to make modifications
+#
+# Also to modify the file use the command ansible-vault edit vars.yaml
+# How to run
+# ansible-playbook -i ~/playbooks_gigamon_testing/inventory/inventory.yaml -vvv ~/playbooks_gigamon_testing/gigamon_test.yaml --extra-vars="trex_num=$multiplier"
+# set multiplier to your choice in my case we are messing around but usually start at 10
+# To run multiple times run the shell script test.sh like this:
+# sh test.sh 1 10 wih the first argument being starting multiplier and the 2nd argument being the ending argument with the multiplier incrementing by 1 each time
+#---
+#- hosts: allhosts
+#  connection: local
+#  roles:
+#   - role: Gigamon_test      
+
+---
+- hosts: allhosts
+  connection: local
+  gather_facts: false
+  tasks:
+  - name: include variables
+    include_vars: ~/playbooks_gigamon_testing/roles/Gigamon_test/vars/main.yaml
+    no_log: 'no'
+
+- hosts: group3root
+  gather_facts: false
+  tasks:
+  - name: include variables
+    include_vars: ~/playbooks_gigamon_testing/roles/Gigamon_test/vars/main.yaml
+    no_log: 'no'
+  - name: copy files to trex/gigatap
+    copy:
+      src: "{{ trex_directory1 }}"
+      dest: "{{ final_trex_directory1 }}"
+      mode: 0755
+  - name: copy pcap files to trex/gigatap
+    copy:
+      src: "{{ trex_directory2 }}"
+      dest: "{{ final_trex_directory2 }}"
+      mode: 0755
+
+- hosts: sensors
+  gather_facts: false
+  tasks:
+  - name: include variables
+    include_vars: ~/playbooks_gigamon_testing/roles/Gigamon_test/vars/main.yaml
+    no_log: 'no'
+    
+  - name: copy sensor script to security onion sensors
+    copy:
+      src: "{{ sensor_directory }}"
+      dest: "{{ final_sensor_directory }}"
+      mode: 0755
+  - name: copy initial run script to security onion sensors
+    copy:
+      src: "{{ initial_dir }}"
+      dest: "{{ final_initial_dir }}"
+      mode: 0755
+  - name: copy drop rate script to security onion sensors
+    copy:
+      src: "{{ drop_dir }}"
+      dest: "{{ final_drop_dir }}"
+      mode: 0755
+  - name: copy initial interface info script to security onion sensors
+    copy:
+      src: "{{ int_dir1 }}"
+      dest: "{{ final_int_dir1 }}"
+      mode: 0755
+  - name: copy final interface info script to security onion sensors
+    copy:
+      src: "{{ int_dir2 }}"
+      dest: "{{ final_int_dir2 }}"
+      mode: 0755
+  - name: copy interface difference script to security onion sensors
+    copy:
+      src: "{{ int_dir3 }}"
+      dest: "{{ final_int_dir3 }}"
+      mode: 0755
+    
+- hosts: sensors
+  gather_facts: false
+  tasks:
+# script can be run in bash if desired. bash script for this is copied to hosts initially
+   - name: include variables
+     include_vars: ~/playbooks_gigamon_testing/roles/Gigamon_test/vars/main.yaml
+     no_log: 'no'
+   - name: restart sensors
+     shell: "so-sensor-restart"
+     ignore_errors: true
+     become: true
+   - name: run initial test
+     shell: "sh ~/initial.sh {{ int_1 }} {{ int_2 }}"
+     ignore_errors: true
+     become: true
+     args:
+       chdir: ~/
+
+- hosts: group3root
+  gather_facts: false
+  tasks:
+  - name: include variables
+    include_vars: ~/playbooks_gigamon_testing/roles/Gigamon_test/vars/main.yaml
+    no_log: 'no'
+  - name: run trex test
+    shell: "/opt/trex/v2.60/t-rex-64 -f /opt/trex/v2.60/cap2/{{ cap2name }} 4 -m {{ trex_num }} -d 300"
+    args:
+      chdir: /opt/trex/v2.60
+
+- hosts: sensors
+  gather_facts: false
+  tasks:
+# script can be run in bash if desired. bash script for this is copied to hosts initially
+   - name: include variables
+     include_vars: ~/playbooks_gigamon_testing/roles/Gigamon_test/vars/main.yaml
+     no_log: 'no'
+   - name: run sensors test
+     shell: "sh ~/sensors.sh {{ int_1 }} {{ int_2 }} {{ trex_num }} {{ suricata_dir }}"
+     ignore_errors: true
+     become: true
+     args:
+       chdir: ~/
